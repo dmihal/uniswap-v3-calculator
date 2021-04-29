@@ -21,6 +21,10 @@ function getTick(priceSqrt) {
     .toString()
 }
 
+function tickToPriceSqrt(tick) {
+  return Math.sqrt(Math.pow(1.0001, tick));
+}
+
 function App() {
   const [values, setValues] = useState({
     reserve0: '1',
@@ -34,15 +38,17 @@ function App() {
 
   return (
     <div className="App">
+      <h2>Uniswap V3 Calculator</h2>
       <label>
         Reserve 0
         <input
+          type="number"
           value={values.reserve0}
           onChange={e => setValues({
             reserve0: e.target.value,
             reserve1: values.reserve1,
             priceSqrt: encodePriceSqrt(e.target.value, values.reserve1),
-            ratio: values.reserve1 / e.target.value,
+            ratio: e.target.value / values.reserve1,
             tick: getTick(encodePriceSqrt(e.target.value, values.reserve1)),
           })}
         />
@@ -50,21 +56,35 @@ function App() {
       <label>
         Reserve 1
         <input
+          type="number"
           value={values.reserve1}
           onChange={e => setValues({
             reserve0: values.reserve0,
             reserve1: e.target.value,
             priceSqrt: encodePriceSqrt(values.reserve0, e.target.value),
-            ratio: e.target.value / values.reserve0,
+            ratio: values.reserve0 / e.target.value ,
             tick: getTick(encodePriceSqrt(values.reserve0, e.target.value)),
           })}
         />
       </label>
       <div>Square root price (decimal): {values.priceSqrt}</div>
       <div>Square root price (Q64.96): {priceSqrtX96}</div>
-      <div>Token 0 Price: {values.ratio} Token 1</div>
-      <div>Token 1 Price: {1 / values.ratio} Token 0</div>
-      <div>Tick: {values.tick}</div>
+      <div>Token 0 Price: {1 / values.ratio} Token 1</div>
+      <div>Token 1 Price: {values.ratio} Token 0</div>
+      <label>
+        Tick: 
+        <input
+          type="number"
+          value={values.tick}
+          onChange={e => setValues({
+            reserve0: Math.pow(1.0001, e.target.value),
+            reserve1: 1,
+            priceSqrt: tickToPriceSqrt(e.target.value),
+            ratio: Math.pow(1.0001, e.target.value),
+            tick: e.target.value,
+          })}
+        />
+      </label>
     </div>
   );
 }
