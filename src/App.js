@@ -25,6 +25,10 @@ function tickToPriceSqrt(tick) {
   return Math.sqrt(Math.pow(1.0001, tick));
 }
 
+function x96ToDecimal(number) {
+  return new bn(number).div(new bn(2).pow(96)).toString();
+}
+
 function App() {
   const [values, setValues] = useState({
     reserve0: '1',
@@ -67,10 +71,40 @@ function App() {
           })}
         />
       </label>
-      <div>Square root price (decimal): {values.priceSqrt}</div>
-      <div>Square root price (Q64.96): {priceSqrtX96}</div>
-      <div>Token 0 Price: {1 / values.ratio} Token 1</div>
-      <div>Token 1 Price: {values.ratio} Token 0</div>
+      <div>
+        <label>
+          Square root price (decimal):
+          <input
+            type="number"
+            value={values.priceSqrt}
+            onChange={e => setValues({
+              reserve0: Math.pow(e.target.value, 2),
+              reserve1: 1,
+              priceSqrt: e.target.value,
+              ratio: Math.pow(e.target.value, 2),
+              tick: getTick(e.target.value),
+            })}
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Square root price (Q64.96):
+          <input
+            type="number"
+            value={priceSqrtX96}
+            onChange={e => setValues({
+              reserve0: Math.pow(x96ToDecimal(e.target.value), 2),
+              reserve1: 1,
+              priceSqrt: x96ToDecimal(e.target.value),
+              ratio: Math.pow(x96ToDecimal(e.target.value), 2),
+              tick: getTick(x96ToDecimal(e.target.value)),
+            })}
+          />
+        </label>
+      </div>
+      <div>Token 0 Price: {1 / values.ratio} (Token 1)</div>
+      <div>Token 1 Price: {values.ratio} (Token 0)</div>
       <label>
         Tick: 
         <input
